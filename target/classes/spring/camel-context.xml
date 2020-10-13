@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean
+        class="org.apache.camel.component.servlet.CamelHttpTransportServlet" id="camelHttpTransportServlet"/>
+    <bean
+        class="org.springframework.boot.web.servlet.ServletRegistrationBean" id="servlet">
+        <property name="name" value="CamelServlet"/>
+        <property name="servlet" ref="camelHttpTransportServlet"/>
+        <property name="urlMappings" value="/myfuselab/*"/>
+    </bean>
+    <!-- Define a traditional camel context here -->
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <restConfiguration apiContextPath="api-docs" bindingMode="json"
+            component="servlet" contextPath="/myfuselab">
+            <apiProperty key="cors" value="true"/>
+            <apiProperty key="api.title" value="My First Camel API Lab"/>
+            <apiProperty key="api.version" value="1.0.0"/>
+        </restConfiguration>
+        <rest id="rest-cbd058c7-28d8-429e-a3c6-fa7380a1b881" path="/employees">
+            <get id="get-58ca304b-6691-4bd4-8426-a9b9539de64f" uri="all">
+                <description>Retrieve all employee data</description>
+                <to uri="direct:getallemployee"/>
+            </get>
+        </rest>
+        <route id="employee" shutdownRoute="Defer">
+            <from id="direct3" uri="direct:getallemployee"/>
+            <to id="_to3" uri="sql:select * from employees LIMIT 10?dataSource=#dataSource"/>
+            <log id="_log3" message="${body}"/>
+        </route>
+    </camelContext>
+</beans>
