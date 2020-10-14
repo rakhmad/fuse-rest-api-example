@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: List
+items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: employee-api
+  spec:
+    tags:
+    - from:
+        kind: ImageStreamImage
+        name: employee-api@sha256:d2e9084a7c432f4080cda22dcd9a9673bad3144299503eb75276e735489a7243
+        namespace: test
+      name: latest
