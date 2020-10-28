@@ -7,56 +7,55 @@ projects:
 metadata:
   generateName: fuse-rest-api-
 components:
-  - id: redhat/java8/latest
-    type: chePlugin
-  - id: redhat/vscode-apache-camel/latest
-    type: chePlugin
-  - id: redhat/dependency-analytics/latest
-    type: chePlugin
-  - mountSources: true
-    endpoints:
-      - name: '8080'
-        port: 8080
-    memoryLimit: 768Mi
-    type: dockerimage
-    volumes:
-      - name: m2
-        containerPath: /home/jboss/.m2
+  - type: chePlugin
+    id: redhat/java8/latest
+  - type: chePlugin
+    id: redhat/vscode-apache-camel/latest
+  - type: chePlugin
+    id: redhat/dependency-analytics/latest
+  - type: dockerimage
+    alias: maven
     image: >-
       registry.redhat.io/codeready-workspaces/plugin-java8-rhel8@sha256:d04f70c8340abaee1a282b77158d054f4faf2225bc17c79aafb413396c367782
-    alias: maven
     env:
-      - value: >-
+      - name: JAVA_OPTS
+        value: >-
           -XX:MaxRAMPercentage=50.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10
           -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4
           -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true
           -Xms20m -Djava.security.egd=file:/dev/./urandom
           -Duser.home=/home/jboss
-        name: JAVA_OPTS
-      - value: $(JAVA_OPTS)
-        name: MAVEN_OPTS
-apiVersion: 1.0.0
+      - name: MAVEN_OPTS
+        value: $(JAVA_OPTS)
+    memoryLimit: 768Mi
+    endpoints:
+      - name: '8080'
+        port: 8080
+    mountSources: true
+    volumes:
+      - name: m2
+        containerPath: /home/jboss/.m2
 commands:
   - name: 1. Build
     actions:
-      - workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
-        type: exec
-        command: MAVEN_OPTS='-Xmx200m' && mvn clean package
+      - type: exec
         component: maven
+        command: MAVEN_OPTS='-Xmx200m' && mvn clean package
+        workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
   - name: 2. Run
     actions:
-      - workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
-        type: exec
-        command: 'mvn spring-boot:run'
+      - type: exec
         component: maven
+        command: 'mvn spring-boot:run'
+        workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
   - name: 3. Run in debug mode
     actions:
-      - workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
-        type: exec
+      - type: exec
+        component: maven
         command: >-
           mvn spring-boot:run -Drun.jvmArguments="-Xdebug
           -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
-        component: maven
+        workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
   - name: 4. Log into deployment cluster
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
@@ -69,10 +68,10 @@ commands:
         component: maven
   - name: 5. Deploy to OpenShift
     actions:
-      - workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
-        type: exec
-        command: 'mvn fabric8:deploy -Popenshift -DskipTests'
+      - type: exec
         component: maven
+        command: 'mvn fabric8:deploy -Popenshift -DskipTests'
+        workdir: '${CHE_PROJECTS_ROOT}/fuse-rest-api-example'
   - name: Debug remote java application
     actions:
       - type: vscode-launch
