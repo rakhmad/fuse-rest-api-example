@@ -1,5 +1,5 @@
 metadata:
-  generateName: fuse-rest-api-
+  name: fuse-rest-api-crw
 projects:
   - name: fuse-rest-api-example
     source:
