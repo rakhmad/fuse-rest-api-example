@@ -4,6 +4,8 @@ projects:
       location: 'https://github.com/mhockelberg/fuse-rest-api-example.git'
       type: git
       branch: master
+metadata:
+  generateName: fuse-rest-api-
 components:
   - id: redhat/java8/latest
     type: chePlugin
