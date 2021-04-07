@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <bean class="org.apache.camel.component.servlet.CamelHttpTransportServlet" id="camelHttpTransportServlet" />
-    <bean class="org.springframework.boot.web.servlet.ServletRegistrationBean" id="servlet">
-        <property name="name" value="CamelServlet" />
-        <property name="servlet" ref="camelHttpTransportServlet" />
-        <property name="urlMappings" value="/myfuselab/*" />
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean
+        class="org.apache.camel.component.servlet.CamelHttpTransportServlet" id="camelHttpTransportServlet"/>
+    <bean
+        class="org.springframework.boot.web.servlet.ServletRegistrationBean" id="servlet">
+        <property name="name" value="CamelServlet"/>
+        <property name="servlet" ref="camelHttpTransportServlet"/>
+        <property name="urlMappings" value="/myfuselab/*"/>
     </bean>
     <!-- Define a traditional camel context here -->
     <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
-        <restConfiguration apiContextPath="api-docs" bindingMode="json" component="servlet" contextPath="/myfuselab">
-            <apiProperty key="cors" value="true" />
-            <apiProperty key="api.title" value="My First Camel API Lab" />
-            <apiProperty key="api.version" value="1.0.0" />
+        <restConfiguration apiContextPath="api-docs" bindingMode="json"
+            component="servlet" contextPath="/v1/api">
+            <apiProperty key="cors" value="true"/>
+            <apiProperty key="api.title" value="My First Camel API Lab"/>
+            <apiProperty key="api.version" value="1.0.0"/>
         </restConfiguration>
-        <rest id="rest-cbd058c7-28d8-429e-a3c6-fa7380a1b881" path="/employees">
-            <get id="d71695be-171d-4dac-9efb-abf5e7011998" uri="/">
-                <to uri="direct:getAllInsured" />
+        <rest id="rest-0ec75b77-ecf6-4b5d-9d00-91a76431ce93">
+            <get id="b0bdf780-b0fd-436c-b1e5-3b4c737a5dfd" uri="/insured">
+                <to uri="direct:getAllInsured"/>
             </get>
         </rest>
         <route id="insured" shutdownRoute="Defer">
-            <from id="direct3" uri="direct:getAllInsured" />
-            <to id="_to3" uri="sql:select * from insured LIMIT 10?dataSource=#dataSource" />
-            <log id="_log3" message="${body}" />
+            <from id="direct3" uri="direct:getAllInsured"/>
+            <to id="_to3" uri="sql:select * from insured LIMIT 10?dataSource=#dataSource"/>
+            <log id="_log3" message="${body}"/>
         </route>
     </camelContext>
 </beans>
